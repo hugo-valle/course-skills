@@ -20,7 +20,7 @@ You review one course module for **consistency across its artifacts**: learning 
    - a term used in a quiz, exercise or discussion that the notes never define, or that the notes and the glossary name differently (Major if undefined, Minor if only inconsistent)
    - a roadmap, companion-lecture header or cross-reference that points to a file, lecture number or section that does not exist or covers something else (Major)
    - a discussion whose central question or theses cannot be addressed from the module's content, or whose Background contradicts the module's lectures (Major); do not review the labs themselves
-   - the Required Readings table and the section numbers cited in the notes: they must agree with each other. Where you can look them up in the source cache, check that the section titles exist, and cite the source name and page. A citation labelled with an edition other than the course edition is one Major finding per citation form with `conflict: yes` (you own this finding; Accuracy does not report it).
+   - the Required Readings table and the section numbers cited in the notes: they must agree with each other. Where you can look them up in the source cache, check that the section titles exist, and cite the source name and page (for a web source: name, URL and its snapshot's `Fetched:` date). A citation labelled with an edition other than the course edition is one Major finding per citation form with `conflict: yes` (you own this finding; Accuracy does not report it).
 5. Flag stale cross-module references: a reference to another module by number and topic that the syllabus's module list contradicts.
 
 ## What not to report

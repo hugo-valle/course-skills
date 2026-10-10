@@ -1,6 +1,6 @@
 ---
 name: review-module
-description: Review one module's lecture notes, quizzes, hands-on exercises and discussion with three parallel read-only reviewer agents (Accuracy, Style, Alignment) and report ranked findings that cite the course's sources by name and page. Use when asked to review, proofread, audit or quality-check a module's course content.
+description: Review one module's lecture notes, quizzes, hands-on exercises and discussion with three parallel read-only reviewer agents (Accuracy, Style, Alignment) and report ranked findings that cite the course's sources by name and page (web sources by URL and snapshot date). Use when asked to review, proofread, audit or quality-check a module's course content.
 ---
 
 # Review Module
@@ -14,7 +14,7 @@ Course details come from `COURSE.md` at the repo root: "Module layout" (artifact
 Reference files in `reference/` (relative to this skill; `<skill>` below is the base directory shown when the skill loads, normally `~/.claude/skills/review-module`):
 
 - `style-rubric.md`: the generic style rules (N, Q, E, D).
-- `extract-sources.sh`: builds the source cache from the manifest. `test_extract_sources.sh` is its self-test.
+- `extract-sources.sh`: builds the source cache from the manifest: PDF pages (`kind` `pdf`) and dated text snapshots of web documentation (`kind` `url`). A rerun keeps existing snapshots; `--refresh` fetches them again. `test_extract_sources.sh` is its self-test.
 
 The reviewers are the agents `module-accuracy-reviewer`, `module-style-reviewer` and `module-alignment-reviewer`. They have only read and search tools.
 
@@ -25,7 +25,7 @@ The reviewers are the agents `module-accuracy-reviewer`, `module-style-reviewer`
 - Never branch, commit or open PRs. Stop at the working tree (see Done).
 - Findings live in chat only. Do not save reports into the repo. The only exception: with the user's OK, findings left unapplied may be published as an issue (see Done).
 - Never quote a source at length in findings: a short phrase and a section or page reference is enough. Sources are copyrighted and their folder is git-ignored; never stage it.
-- Every number, name and claim in a finding must trace to a file and line, or to a source by name and page. Never invent values. Line numbers come from `grep -n` or `cat -n`, never from estimation; spot-check a few in the merged report before presenting it.
+- Every number, name and claim in a finding must trace to a file and line, or to a source by name and page (a web source by name, URL and snapshot date). Never invent values. Line numbers come from `grep -n` or `cat -n`, never from estimation; spot-check a few in the merged report before presenting it.
 - Source claims that cannot be located are tagged `unverified against <source names>`. Never "correct" them.
 - **Source conflicts:** if a note disagrees with a source, do not pick a side silently. Ask the user with `AskUserQuestion`, one question per conflict, quoting both versions with file and line (and source name and page) and offering each resolution as an option (recommended first).
 
@@ -34,7 +34,7 @@ The reviewers are the agents `module-accuracy-reviewer`, `module-style-reviewer`
 1. Parse `NN` and zero-pad it (`9` → `09`). If `COURSE.md` lists `NN` among the modules with no content (exam weeks), refuse and say so. If the module's notes folder does not exist, stop and say so.
 2. Collect the artifact set: each artifact type in the "Module layout" table whose root is a per-module folder (`moduleNN`), with its source files. Leave out generated files. A missing artifact type is a coverage gap in the report, not an error. Apply `--only` to this set; reject a flag combination that selects nothing (report the gap and stop).
 3. Staleness check (no reviewer needed): for each source file with a generated sibling of the same stem (for example a quiz `.md` and its `.zip`), compare modification times with `stat`. Mtimes are unreliable right after a `git checkout` or clone; say so in the report when the gap is under a minute. Record each source whose generated file is older by a minute or more as a rebuild target for Phase 4; a smaller gap is checkout noise.
-4. Sources: unless only the Style reviewer is selected, run `<skill>/reference/extract-sources.sh` from the repo root. If it exits non-zero, stop and show its message. Read the manifest it names for each source's `id` (its cache folder under `instructor_material/.source-cache/`) and `name` (how findings cite it).
+4. Sources: unless only the Style reviewer is selected, run `<skill>/reference/extract-sources.sh` from the repo root. Add `--refresh` only when the user asks for fresh web snapshots. If it exits non-zero, stop and show its message. Read the manifest it names for each source's `id` (its cache folder under `instructor_material/.source-cache/`) and `name` (how findings cite it).
 5. Read the glossary named in "Pointers", if any, and the "Course style rules" section.
 
 ## Phase 2: Dispatch reviewers
@@ -43,7 +43,7 @@ Launch the selected reviewer agents **in one message, in parallel**, by name (`s
 
 - the module number and the artifact file list (absolute paths) from Phase 1, labelled by artifact type
 - the repo root as the working directory, so relative paths resolve
-- Accuracy and Alignment: the source cache path, each source's `id`, `name` and PDF path, and the course edition and citation form from "Sources"
+- Accuracy and Alignment: the source cache path, each source's `id`, `name` and PDF path or URL, and the course edition and citation form from "Sources"
 - Style: the absolute path of `<skill>/reference/style-rubric.md` and the "Course style rules" section, pasted in
 - Alignment: the syllabus path and the rubric path (it reads only rules Q7 and Q10)
 - Style and Alignment: the glossary path
@@ -59,7 +59,7 @@ Each reviewer returns findings in this exact shape, one per finding:
   quote: "<verbatim text, 25 words max>"
   problem: <one sentence>
   fix: <suggested replacement or action>
-  evidence: <computation, other file:line, rule ID, or source name and page; or "unverified against <source names>">
+  evidence: <computation, other file:line, rule ID, source name and page, or for a web source name, URL and snapshot date; or "unverified against <source names>">
   conflict: yes | no   # yes = note disagrees with a source
 ```
 
