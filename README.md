@@ -20,6 +20,11 @@ git clone https://github.com/hugo-valle/course-skills.git ~/course-skills
 | `course-design` | Whole-course evaluation against the syllabus; drafts proposals, publishes approved ones as issues. Drafts `COURSE.md` when a course has none |
 | `course-implement` | Carries out one approved `course-design` proposal through the build skills `COURSE.md` names |
 | `slide-prep` | Generates a module's SlideKraft slides file from its notes, word for word, and checks it against a measured slide budget (`reference/check_budget.py --self-test`) |
+| `review-module` | Reviews one module with three read-only reviewer agents (Accuracy, Style, Alignment); findings cite the course's sources by name and page. Builds the source cache from the course's `instructor_material/README.md` (`reference/test_extract_sources.sh` is its self-test) |
+
+| Agent | Use it for |
+|---|---|
+| `module-accuracy-reviewer`, `module-style-reviewer`, `module-alignment-reviewer` | Dispatched by `review-module` only. Read and search tools only, so a reviewer cannot edit files |
 
 ## Rules for skills in this repo
 
@@ -31,4 +36,5 @@ git clone https://github.com/hugo-valle/course-skills.git ~/course-skills
 ```bash
 scripts/test_leak_check.sh   # self-test of the leak check
 scripts/leak_check.sh        # skills/ and agents/ are free of course terms
+skills/review-module/reference/test_extract_sources.sh   # source extractor self-test
 ```
