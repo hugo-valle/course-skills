@@ -8,7 +8,7 @@ fail=0
 echo "Generic rule: read COURSE.md." > "$tmp/clean.md"
 "$here/leak_check.sh" "$tmp" >/dev/null 2>&1 || { echo "FAIL: clean tree flagged"; fail=1; }
 
-for term in "CS 2810" "cs6200" "Patterson & Hennessy" "P&H §4.7" "Kialo" "hazbox"; do
+for term in "CS 2810" "cs6200" "Patterson & Hennessy" "P&H §4.7" "Kialo" "hazbox" "Dr. Hugo Valle"; do
   echo "Example: $term." > "$tmp/leak.md"
   "$here/leak_check.sh" "$tmp" >/dev/null 2>&1 && { echo "FAIL: '$term' not flagged"; fail=1; }
   rm "$tmp/leak.md"

@@ -12,6 +12,7 @@ Patterson|Hennessy|P&H
 \bKialo\b
 \bWeber\b
 GLOSSARY\.md
+\bHugo Valle\b
 \b(hazbox|stallcell|hazcell|fwdcell|bubblecell)\b
 '
 pattern=$(printf '%s\n' "$terms" | grep -v '^$' | paste -sd'|' -)
