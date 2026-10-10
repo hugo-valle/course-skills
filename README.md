@@ -7,7 +7,7 @@ The skills hold no course-specific detail. Each course repo describes itself in 
 ## Install
 
 ```bash
-git clone <this repo> ~/course-skills
+git clone https://github.com/hugo-valle/course-skills.git ~/course-skills
 ~/course-skills/install.sh
 ```
 
