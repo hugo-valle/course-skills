@@ -14,3 +14,8 @@ The course-building skills were first written inside one course repo (CS 2810) w
 
 - A new course needs a `COURSE.md` before the global skills can work in it.
 - Project copies of a global skill must be deleted from course repos so an old copy never shadows the global one.
+
+## Amendment, 2026-10-10 (cs2810-master#105)
+
+- `quiz-authoring` is global after all: what it holds is the text2qti format and quiz-writing rules, which every course shares. The course's question types, file names and coverage target live in `COURSE.md` ("Quizzes"), so it no longer carries stack detail. Lab skills stay per-course adapters.
+- `template/` is a deliberate exception to "no copies". Its scripts, hooks and CI must sit inside each course repo to run there, so each course copies them once and owns them. The `contributing-workflow` skill describes the template's behaviour and defers to the repo's copy where they differ.

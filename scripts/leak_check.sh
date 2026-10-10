@@ -1,7 +1,8 @@
 #!/usr/bin/env bash
 # Fail if a global skill or agent names a specific course.
 # Course details belong in each course's COURSE.md, never in the shared core.
-# Usage: scripts/leak_check.sh [path ...]   (default: the repo's skills/ and agents/)
+# Usage: scripts/leak_check.sh [path ...]
+#   default: the repo's skills/, agents/ and template/, except template/docs/agents/ (example config)
 set -u
 repo="$(cd "$(dirname "$0")/.." && pwd)"
 
@@ -17,10 +18,16 @@ GLOSSARY\.md
 '
 pattern=$(printf '%s\n' "$terms" | grep -v '^$' | paste -sd'|' -)
 
-[ $# -eq 0 ] && set -- "$repo/skills" "$repo/agents"
+label="$*"
+if [ $# -eq 0 ]; then
+  label="skills/, agents/, template/ except docs/agents/"
+  set -- "$repo/skills" "$repo/agents"
+  [ -d "$repo/template" ] && while IFS= read -r f; do set -- "$@" "$f"; done \
+    < <(find "$repo/template" -path "$repo/template/docs/agents" -prune -o -type f -print)
+fi
 grep -rniE "$pattern" "$@"
 case $? in
   0) echo "leak_check: course-specific terms found above; move them to COURSE.md" >&2; exit 1 ;;
-  1) echo "leak_check: clean ($*)" ;;
-  *) echo "leak_check: could not read a path ($*)" >&2; exit 2 ;;
+  1) echo "leak_check: clean ($label)" ;;
+  *) echo "leak_check: could not read a path ($label)" >&2; exit 2 ;;
 esac

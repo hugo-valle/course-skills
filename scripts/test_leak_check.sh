@@ -19,6 +19,15 @@ echo "Example: CS-2810." > "$tmp/leak.md"
 (cd "$tmp" && "$here/leak_check.sh" leak.md >/dev/null 2>&1) && { echo "FAIL: relative path not checked from caller dir"; fail=1; }
 rm "$tmp/leak.md"
 
+# The default run covers template/ but skips its example config (docs/agents).
+mkdir -p "$tmp/repo/scripts" "$tmp/repo/skills" "$tmp/repo/agents" "$tmp/repo/template/docs/agents" "$tmp/repo/template/.githooks"
+cp "$here/leak_check.sh" "$tmp/repo/scripts/"
+echo "Glossary: GLOSSARY.md." > "$tmp/repo/template/docs/agents/domain.md"
+echo "# generic hook" > "$tmp/repo/template/.githooks/pre-push"
+"$tmp/repo/scripts/leak_check.sh" >/dev/null 2>&1 || { echo "FAIL: template example config flagged"; fail=1; }
+echo "# CS 2810 hook" > "$tmp/repo/template/.githooks/pre-push"
+"$tmp/repo/scripts/leak_check.sh" >/dev/null 2>&1 && { echo "FAIL: template/ not checked by default"; fail=1; }
+
 # A missing path is an error, never a silent pass.
 "$here/leak_check.sh" "$tmp/nope" >/dev/null 2>&1 && { echo "FAIL: missing path passed"; fail=1; }
 

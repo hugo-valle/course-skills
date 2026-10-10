@@ -1,0 +1,48 @@
+#!/usr/bin/env bash
+#
+# pre-push hook -- block direct pushes to protected branches (main / master).
+# The course workflow is: issue -> branch -> Pull Request.
+# Enabled via: ./scripts/install-hooks.sh   (sets core.hooksPath=.githooks)
+#
+# Emergency override (discouraged, maintainers only):
+#   ALLOW_PUSH_TO_MAIN=1 git push ...
+#
+set -euo pipefail
+
+protected_re='^(refs/heads/)?(main|master)$'
+
+if [ "${ALLOW_PUSH_TO_MAIN:-0}" = "1" ]; then
+  echo "pre-push: ALLOW_PUSH_TO_MAIN=1 -- skipping protected-branch check." >&2
+  exit 0
+fi
+
+blocked=0
+while read -r _local_ref _local_sha remote_ref _remote_sha; do
+  [ -n "${remote_ref:-}" ] || continue
+  if printf '%s\n' "$remote_ref" | grep -Eq "$protected_re"; then
+    blocked=1
+  fi
+done
+
+if [ "$blocked" -eq 1 ]; then
+  cat >&2 <<'EOF'
+
+  Direct push to "main" is blocked.
+
+  This course follows a Git workflow:
+    1. Create an issue describing the change
+    2. Create a branch named for that issue     e.g.  42-fix-quiz-typo
+    3. Push the branch and open a Pull Request   gh pr create --fill
+    4. Merge the PR into main after review + CI
+
+  Push your feature branch instead:
+    git push -u origin <your-branch>
+
+  Emergency override (discouraged, maintainers only):
+    ALLOW_PUSH_TO_MAIN=1 git push ...
+
+EOF
+  exit 1
+fi
+
+exit 0

@@ -1,0 +1,21 @@
+#!/usr/bin/env bash
+#
+# commit-msg hook -- enforce the commit-message policy.
+# Enabled via: ./scripts/install-hooks.sh   (sets core.hooksPath=.githooks)
+# Bypass (discouraged): git commit --no-verify
+#
+set -euo pipefail
+
+msg_file="$1"
+repo_root="$(git rev-parse --show-toplevel)"
+checker="${repo_root}/scripts/check-commit-message.sh"
+
+if [ ! -x "$checker" ]; then
+  echo "commit-msg: ${checker} is missing or not executable; skipping check." >&2
+  exit 0
+fi
+
+branch="$(git rev-parse --abbrev-ref HEAD 2>/dev/null || echo '')"
+[ "$branch" = "HEAD" ] && branch=""
+
+exec "$checker" --file "$msg_file" --branch "$branch"

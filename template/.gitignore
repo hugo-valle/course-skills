@@ -1,0 +1,7 @@
+# Copyrighted instructor-only material (textbook PDF and its extracted text)
+instructor_material/
+
+# Python venv and bytecode for scripts/rebuild_module.py
+.venv/
+__pycache__/
+*.pyc

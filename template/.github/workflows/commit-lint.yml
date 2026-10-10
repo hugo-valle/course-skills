@@ -1,0 +1,63 @@
+name: Commit Message Lint
+
+on:
+  pull_request:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+jobs:
+  commit-lint:
+    name: Validate commit messages
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+
+      - name: Lint each commit in the PR
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+          PR_BRANCH: ${{ github.event.pull_request.head.ref }}
+        run: |
+          set -euo pipefail
+          revs="$(git rev-list --no-merges "${BASE_SHA}..${HEAD_SHA}")"
+          if [ -z "$revs" ]; then
+            echo "No non-merge commits to check."
+            exit 0
+          fi
+          rc=0
+          for rev in $revs; do
+            echo "::group::$(git show -s --format='%h %s' "$rev")"
+            if ! bash scripts/check-commit-message.sh --rev "$rev" --branch "$PR_BRANCH"; then
+              rc=1
+            fi
+            echo "::endgroup::"
+          done
+          if [ "$rc" -ne 0 ]; then
+            echo "::error::One or more commit messages do not meet the policy (see scripts/check-commit-message.sh)."
+          fi
+          exit $rc
+
+      - name: Verify the PR is linked to an issue
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+          PR_TITLE: ${{ github.event.pull_request.title }}
+          PR_BODY: ${{ github.event.pull_request.body }}
+        run: |
+          set -euo pipefail
+          if printf '%s\n%s\n' "$PR_TITLE" "$PR_BODY" \
+             | grep -Eiq '(close[sd]?|fix(e[sd])?|resolve[sd]?)[[:space:]]+#[0-9]+'; then
+            echo "PR references an issue with a closing keyword."
+          elif git log --format=%B "${BASE_SHA}..${HEAD_SHA}" \
+             | grep -Eiq '(#[0-9]+|GH-[0-9]+|/issues/[0-9]+)'; then
+            echo "PR body has no closing keyword, but commits reference an issue."
+          else
+            echo "::error::Link an issue either in the PR description with a closing keyword (e.g. 'Closes #42') or in one of the PR commit messages."
+            exit 1
+          fi
