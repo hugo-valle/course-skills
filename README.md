@@ -21,6 +21,7 @@ git clone https://github.com/hugo-valle/course-skills.git ~/course-skills
 | `course-implement` | Carries out one approved `course-design` proposal through the build skills `COURSE.md` names |
 | `slide-prep` | Generates a module's SlideKraft slides file from its notes, word for word, and checks it against a measured slide budget (`reference/check_budget.py --self-test`) |
 | `review-module` | Reviews one module with three read-only reviewer agents (Accuracy, Style, Alignment); findings cite the course's sources by name and page. Builds the source cache from the course's `instructor_material/README.md` (`reference/test_extract_sources.sh` is its self-test) |
+| `add-images` | Plans, draws, builds and embeds TikZ figures for one module. Ships the base style (`reference/base.tex`: palette, title, note, callout, badge, arrows); each course keeps a style layer for its domain shapes and colour meanings, named in `COURSE.md` ("Figures") |
 
 | Agent | Use it for |
 |---|---|

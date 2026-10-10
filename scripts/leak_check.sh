@@ -13,7 +13,7 @@ Patterson|Hennessy|P&H
 \bWeber\b
 GLOSSARY\.md
 \bHugo Valle\b
-\b(hazbox|stallcell|hazcell|fwdcell|bubblecell)\b
+\b(hazbox|stallcell|hazcell|fwdcell|bubblecell|pipeRow|cHaz|cFwd|cStall)\b
 '
 pattern=$(printf '%s\n' "$terms" | grep -v '^$' | paste -sd'|' -)
 

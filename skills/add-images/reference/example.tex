@@ -1,0 +1,15 @@
+% Exemplar figure: <figures folder>/figNN_<topic>.tex
+% One idea per figure, title on top, optional note card below, colours only via the style layer.
+\documentclass{article}
+\input{<style layer>}% path from COURSE.md "Figures", relative to the figures folder
+\begin{document}
+\begin{tikzpicture}
+  \node[draw=cBlue, fill=cBlue!12, thick, rounded corners=3pt, minimum width=1.8cm, minimum height=1.2cm] (a) at (0,0) {Input};
+  \node[draw=cBlue, fill=cBlue!12, thick, rounded corners=3pt, minimum width=1.8cm, minimum height=1.2cm] (b) at (3.6,0) {Output};
+  \draw[flow] (a) -- (b);
+  \draw[strong=cGreen] (b.north) to[out=120, in=60] node[above] {feedback} (a.north);
+  \node[badge=cGreen] at (1.8,0.9) {1};
+  \node[title] at (1.8,2.2) {Short Descriptive Title};
+  \node[note] at (1.8,-1.5) {\textbf{Takeaway:} one sentence the student should remember.};
+\end{tikzpicture}
+\end{document}
