@@ -17,11 +17,13 @@ Commit the `.claude/settings.json` they write. Anyone who opens the course repo 
 
 Updates: `plugin.json` sets no `version`, so every push to `main` is an update. Auto-update is off by default; turn it on under Marketplaces in `/plugin`, or run `claude plugin marketplace update course-skills`.
 
+Why a plugin: [ADR 0004](docs/adr/0004-distribute-as-a-claude-code-plugin.md).
+
 To edit the skills and test them live, start Claude Code with `claude --plugin-dir ~/course-skills`; that copy replaces the installed one for the session, and `/reload-plugins` picks up edits.
 
 ### Without the plugin
 
-A course repo that cannot use plugins can symlink instead: `git clone https://github.com/hugo-valle/course-skills.git ~/course-skills`, then `~/course-skills/install.sh <course-repo>...`. This links `skills/*` and `agents/*` into the repo's `.claude/`, so the commands are bare (`/course-review`). The links are machine-specific, so add `.claude/skills/course-*` and `.claude/agents/course-*` to that repo's `.gitignore`; a fresh clone has no skills until the installer is run. Why: [ADR 0003](docs/adr/0003-install-skills-per-course-repo.md).
+A course repo that cannot use plugins can symlink instead: `git clone https://github.com/hugo-valle/course-skills.git ~/course-skills`, then `~/course-skills/install.sh <course-repo>...`. This links `skills/*` and `agents/*` into the repo's `.claude/`, so the commands are bare (`/course-review`). The links are machine-specific, so add `.claude/skills/course-*` and `.claude/agents/course-*` to that repo's `.gitignore`; a fresh clone has no skills until the installer is run. Why: [ADR 0003](docs/adr/0003-install-skills-per-course-repo.md), superseded for plugin-capable repos by [ADR 0004](docs/adr/0004-distribute-as-a-claude-code-plugin.md).
 
 ## Contents
 
