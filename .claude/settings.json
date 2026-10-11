@@ -1,0 +1,15 @@
+{
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Edit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "grep -qE '\"file_path\": *\"[^\"]*/(skills|agents|template)/' && { scripts/leak_check.sh >&2 || exit 2; } || true"
+          }
+        ]
+      }
+    ]
+  }
+}
