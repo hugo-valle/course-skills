@@ -14,5 +14,5 @@ Skills and agents in `~/.claude/` share one flat namespace with every other skil
 ## Consequences
 
 - Course repos that name the old skills (`COURSE.md`, `CLAUDE.md`) must be updated.
-- `install.sh` removes dangling links into this repo, so a rename leaves no stale link in `~/.claude/`.
+- `install.sh` removes dangling links into this repo, so a rename leaves no stale link in a course repo.
 - [ADR 0001](0001-global-core-per-course-adapters.md) keeps the old names; it is history.

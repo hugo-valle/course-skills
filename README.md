@@ -8,10 +8,10 @@ The skills hold no course-specific detail. Each course repo describes itself in 
 
 ```bash
 git clone https://github.com/hugo-valle/course-skills.git ~/course-skills
-~/course-skills/install.sh
+~/course-skills/install.sh ~/cs2810/cs2810-master ~/cs6200/cs6200-master   # one or more course repos
 ```
 
-`install.sh` symlinks each folder in `skills/` and each file in `agents/` into `~/.claude/skills/` and `~/.claude/agents/`. Re-run it after adding a skill or agent. Edits to an existing one need no re-run.
+`install.sh <course-repo>...` symlinks each folder in `skills/` and each file in `agents/` into that repo's `.claude/skills/` and `.claude/agents/`, next to any adapter skill the course keeps there. Nothing is installed globally. Re-run it after adding a skill or agent; edits to an existing one need no re-run. The links are machine-specific, so each course's `.gitignore` carries `.claude/skills/course-*` and `.claude/agents/course-*` (the template has them; the installer warns if they are missing). A fresh clone or CI has no skills until the installer is run there. For a brand-new course, make the repo folder, run the installer on it, then `/course-init`. Why: [ADR 0003](docs/adr/0003-install-skills-per-course-repo.md).
 
 ## Contents
 

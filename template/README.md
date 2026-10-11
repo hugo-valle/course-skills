@@ -1,6 +1,6 @@
 # Course repo template
 
-Files a new course repo copies into itself, because the global skills expect them in the repo. Each course keeps and edits its own copies; nothing here is symlinked.
+Files a new course repo copies into itself, because the shared skills expect them in the repo. Each course keeps and edits its own copies; nothing here is symlinked.
 
 `/course-init` copies it as its first phase. By hand, from the course repo root:
 

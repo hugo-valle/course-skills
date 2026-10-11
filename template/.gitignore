@@ -5,3 +5,7 @@ instructor_material/
 .venv/
 __pycache__/
 *.pyc
+
+# Symlinks to the shared course-skills (machine-specific; run course-skills/install.sh)
+.claude/skills/course-*
+.claude/agents/course-*

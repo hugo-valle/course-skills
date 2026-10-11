@@ -19,6 +19,7 @@ Reference files: `reference/syllabus-skeleton.md` (relative to this skill); the 
 - **Course detail goes into the course repo, never into this skill.**
 - `instructor_material/` holds copyrighted sources: never stage it.
 - Never commit or push. Stop at the working tree; the first commit goes through `course-workflow`.
+- If this skill was found, `install.sh` has already linked the shared skills into this repo. Its `.gitignore` lines come with the template (Phase 1).
 - If `COURSE.md` already exists, stop: the course is set up. Suggest `/course-design` instead.
 
 ## Phase 1: Copy the template
