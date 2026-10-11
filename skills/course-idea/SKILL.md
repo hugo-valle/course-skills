@@ -1,5 +1,5 @@
 ---
-name: idea
+name: course-idea
 description: Capture a loose course idea as a GitHub issue labelled `idea` for future exploring
 argument-hint: <the idea, in your own words>
 allowed-tools: Bash(gh issue create:*), Bash(gh label create:*), Bash(gh label list:*), Bash(git remote:*), Read, Grep, Glob
