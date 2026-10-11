@@ -7,7 +7,7 @@ ADR 0003 linked the skills into each course repo with `install.sh`. The links ho
 ## Decisions
 
 - **Names stay as they are** (`course-*`); the plugin is `course-skills`, so commands read `/course-skills:course-review` and agents `course-skills:course-module-*-reviewer`. Renaming the plugin `course` and dropping the prefix was rejected: it would reverse [ADR 0002](0002-course-prefix-for-shared-skills.md) for a shorter command.
-- **No `version`.** Every push to `main` is an update. Pinning and bumping a version on each release was rejected while the instructor is the only consumer.
+- **`version` is pinned in `plugin.json` and bumped per release** (first release `0.1.0`). Users keep their cached copy until it changes, so a push without a bump is not delivered. Omitting `version`, which makes every push to `main` an update, was rejected: unreleased edits would reach every course repo.
 - **`template/` stays a copy** in each course repo (ADR 0001 amendment).
 - **`install.sh` stays as a fallback** for a repo that cannot use plugins (today `cs6610-master`, which has no `COURSE.md` yet). Delete it when no repo uses it.
 

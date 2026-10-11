@@ -1,5 +1,6 @@
 {
   "name": "course-skills",
+  "version": "0.1.0",
   "description": "Skills and agents for building university courses, shared by every course repo.",
   "author": {
     "name": "Hugo Valle"

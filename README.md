@@ -15,7 +15,7 @@ claude plugin install course-skills@course-skills --scope project
 
 Commit the `.claude/settings.json` they write. Anyone who opens the course repo and accepts the folder-trust prompt gets the skills and agents, with no script and no symlinks. They are namespaced by the plugin, so you run `/course-skills:course-review`, and the agents appear as `course-skills:course-module-*-reviewer`. The repo is public, so no git credentials are needed to fetch the skills. For a brand-new course, make the repo folder, run the two commands, then `/course-skills:course-init`.
 
-Updates: `plugin.json` sets no `version`, so every push to `main` is an update. Auto-update is off by default; turn it on under Marketplaces in `/plugin`, or run `claude plugin marketplace update course-skills`.
+Updates: users stay on the version in `.claude-plugin/plugin.json` until it changes, so bump `version` in the commit that releases a change (`0.1.0` is the first). Auto-update is off by default; turn it on under Marketplaces in `/plugin`, or run `claude plugin marketplace update course-skills`.
 
 Why a plugin: [ADR 0004](docs/adr/0004-distribute-as-a-claude-code-plugin.md).
 
