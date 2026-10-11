@@ -17,6 +17,7 @@ git clone https://github.com/hugo-valle/course-skills.git ~/course-skills
 
 | Skill | Use it for |
 |---|---|
+| `course-init` | Sets up a new course repo: copies `template/`, interviews the instructor and drafts the syllabus, drafts `COURSE.md`, creates module folders and writes the sources manifest, confirming each phase before writing |
 | `course-design` | Whole-course evaluation against the syllabus; drafts proposals, publishes approved ones as issues. Drafts `COURSE.md` when a course has none |
 | `course-implement` | Carries out one approved `course-design` proposal through the build skills `COURSE.md` names |
 | `slide-prep` | Generates a module's SlideKraft slides file from its notes, word for word, and checks it against a measured slide budget (`reference/check_budget.py --self-test`) |

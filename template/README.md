@@ -2,13 +2,14 @@
 
 Files a new course repo copies into itself, because the global skills expect them in the repo. Each course keeps and edits its own copies; nothing here is symlinked.
 
+`/course-init` copies it as its first phase. By hand, from the course repo root:
+
 ```bash
-cp -R ~/course-skills/template/. <course-repo>/
-rm <course-repo>/README.md          # this file; the course root README is its syllabus
-cd <course-repo> && ./scripts/install-hooks.sh
+rsync -a --ignore-existing --exclude /README.md --exclude __pycache__ ~/course-skills/template/ ./
+./scripts/install-hooks.sh
 ```
 
-If the course repo already has a `.gitignore`, merge the template's lines into it instead of overwriting it.
+This skips this file (the course root README is its syllabus) and never overwrites a file the repo already has. If the repo already had a `.gitignore`, merge the template's lines into it.
 
 | Path | What it is | Edit after copying |
 |---|---|---|
@@ -23,4 +24,4 @@ If the course repo already has a `.gitignore`, merge the template's lines into i
 | `docs/agents/` | Example engineering-skills config: issue tracker, triage labels, domain glossary | everything: it is a worked example from one course (the leak check skips it) |
 | `.gitignore` | Keeps `instructor_material/` (copyrighted sources) and the rebuild `.venv` out of git | |
 
-Then write `COURSE.md` (`/course-design` drafts it) so the global skills know the course's layout.
+Then write `COURSE.md` (`/course-init` or `/course-design` drafts it) so the global skills know the course's layout.
