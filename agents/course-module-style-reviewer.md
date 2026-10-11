@@ -1,6 +1,6 @@
 ---
-name: module-style-reviewer
-description: Read-only reviewer that checks one course module's prose and formatting against the generic style rubric plus the course's own style rules. Dispatched by the review-module skill; not for direct use.
+name: course-module-style-reviewer
+description: Read-only reviewer that checks one course module's prose and formatting against the generic style rubric plus the course's own style rules. Dispatched by the course-review skill; not for direct use.
 tools: Read, Grep, Glob
 ---
 

@@ -3,7 +3,7 @@
 Workflow terms for `/course-design`. They live here, not in a course glossary, which holds course vocabulary only.
 
 **Finding**:
-What is wrong or missing in existing content. Comes from `/review-module` for one module, or from the rubric for the whole course.
+What is wrong or missing in existing content. Comes from `/course-review` for one module, or from the rubric for the whole course.
 
 **Proposal**:
 An approvable change that answers one or more findings. Has every field in `proposal-template.md`. Drafted in chat; published as a child issue once approved.

@@ -18,12 +18,12 @@ The "Module layout" table names, per artifact, its root, its source files and it
 After editing a source file, rebuild its output:
 
 - quiz and exercise sources: the rebuild command in "Module layout". Rebuild only the files you changed when a generated file stamps its build time (a quiz `.zip` does), so unchanged ones do not churn.
-- lecture notes → the module's slides file: `/slide-prep NN`
-- figure sources → SVGs: `/add-images NN` (it owns the figure build)
+- lecture notes → the module's slides file: `/course-slides NN`
+- figure sources → SVGs: `/course-images NN` (it owns the figure build)
 
 ## Figures and slides
 
-Use `/add-images NN` for figures ("Figures" in `COURSE.md`) and `/slide-prep NN` for the slides file ("Slides").
+Use `/course-images NN` for figures ("Figures" in `COURSE.md`) and `/course-slides NN` for the slides file ("Slides").
 
 ## Discussions
 
@@ -35,6 +35,6 @@ The glossary is under "Pointers". Check new or edited text against its preferred
 
 ## Reviewing and publishing
 
-- `/review-module NN` reviews one module's notes, quizzes, exercises and discussion.
+- `/course-review NN` reviews one module's notes, quizzes, exercises and discussion.
 - Material marked under "Sources" or "Pointers" as git-ignored is never quoted at length or staged.
-- Changes go through issue → branch → PR (`contributing-workflow`).
+- Changes go through issue → branch → PR (`course-workflow`).

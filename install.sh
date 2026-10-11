@@ -6,6 +6,9 @@ repo="$(cd "$(dirname "$0")" && pwd)"
 status=0
 for kind in skills agents; do
   mkdir -p "$HOME/.claude/$kind"
+  for old in "$HOME/.claude/$kind"/*; do   # drop links left behind by a rename
+    [ -L "$old" ] && [ ! -e "$old" ] && case "$(readlink "$old")" in "$repo"/*) rm "$old"; echo "removed stale: $old";; esac
+  done
   for src in "$repo/$kind"/*; do
     [ -e "$src" ] || continue
     dest="$HOME/.claude/$kind/$(basename "$src")"

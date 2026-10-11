@@ -5,7 +5,7 @@ PREVIEW := .preview
 PNG     := $(patsubst %.tex,$(PREVIEW)/%.png,$(SRC))
 # Paths to the course style layer and base copy (COURSE.md "Figures"), relative to this folder.
 STYLE   := <style layer> <base copy>
-CROP    := $(HOME)/.claude/skills/add-images/reference/crop_png.py
+CROP    := $(HOME)/.claude/skills/course-images/reference/crop_png.py
 
 all: $(SVG)
 
@@ -26,7 +26,7 @@ $(PREVIEW)/%.png: %.tex $(STYLE)
 
 preview: $(PNG)
 
-# clean/distclean delete .preview/ (PDFs, PNGs): ask the user first, see the add-images skill.
+# clean/distclean delete .preview/ (PDFs, PNGs): ask the user first, see the course-images skill.
 clean:
 	rm -rf $(PREVIEW) *.aux *.log *.dvi
 

@@ -1,6 +1,6 @@
 # Slide Prep Terms
 
-**Slides file**: `moduleNN_slides.md` in the module's lecture-notes folder, generated from the module's notes (`moduleNN_N_*.md`) in the format of `format.md` and imported into SlideKraft. Generated: rebuild it with `/slide-prep NN` whenever the notes change; never hand-edit it as a source.
+**Slides file**: `moduleNN_slides.md` in the module's lecture-notes folder, generated from the module's notes (`moduleNN_N_*.md`) in the format of `format.md` and imported into SlideKraft. Generated: rebuild it with `/course-slides NN` whenever the notes change; never hand-edit it as a source.
 
 **Slide**: the text between two `---` dividers in the slides file. SlideKraft imports one as one slide. Every slide title is a level-1 `#` heading.
 

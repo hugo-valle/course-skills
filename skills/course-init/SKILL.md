@@ -9,7 +9,7 @@ Set up one new course repo, run from its root. Five phases; each is shown as a d
 
 Invocation: `/course-init`
 
-Reference files: `reference/syllabus-skeleton.md` (relative to this skill); the `course-design` skill's `reference/course-md.md` (COURSE.md sections and drafting rules) and `reference/lab-stacks.md` (seed lab tooling); the `review-module` skill's `reference/extract-sources.sh`. The template is the `template/` folder of the course-skills repo this skill lives in (`<skill>/../../template`, where `<skill>` is the base directory shown when the skill loads; resolve it with `realpath`).
+Reference files: `reference/syllabus-skeleton.md` (relative to this skill); the `course-design` skill's `reference/course-md.md` (COURSE.md sections and drafting rules) and `reference/lab-stacks.md` (seed lab tooling); the `course-review` skill's `reference/extract-sources.sh`. The template is the `template/` folder of the course-skills repo this skill lives in (`<skill>/../../template`, where `<skill>` is the base directory shown when the skill loads; resolve it with `realpath`).
 
 ## Rules
 
@@ -18,7 +18,7 @@ Reference files: `reference/syllabus-skeleton.md` (relative to this skill); the 
 - **Never invent course facts.** CLO wording, readings, grading weights, dates and lab tools come from the instructor or the existing draft. A fact neither gives stays `unknown: <question>` in the draft.
 - **Course detail goes into the course repo, never into this skill.**
 - `instructor_material/` holds copyrighted sources: never stage it.
-- Never commit or push. Stop at the working tree; the first commit goes through `contributing-workflow`.
+- Never commit or push. Stop at the working tree; the first commit goes through `course-workflow`.
 - If `COURSE.md` already exists, stop: the course is set up. Suggest `/course-design` instead.
 
 ## Phase 1: Copy the template
@@ -61,7 +61,7 @@ Reference files: `reference/syllabus-skeleton.md` (relative to this skill); the 
 
 1. Draft `instructor_material/README.md`: a one-paragraph header (as in `COURSE.md` "Sources"), then the manifest table `| id | kind | location | name |` with one row per source from the interview. `id` is letters, digits, `-` or `_`; `kind` is `pdf` (location relative to the folder) or `url` (one page: prefer the documentation page the notes will cite over a product home page, and tell the instructor a landing page gives reviewers little to check against); `name` is how findings cite it and matches the course edition in `COURSE.md`.
 2. On confirmation write it. A `pdf` row whose file is not in the folder yet stays out of the table (the extractor stops on a missing file); list it under a `Pending:` line below the table and tell the instructor to copy the file in and move the row up.
-3. Snapshot the web docs: run the `review-module` skill's `reference/extract-sources.sh` from the repo root. Done when it exits 0. If a fetch fails, show the message and ask whether to fix the URL or drop the row.
+3. Snapshot the web docs: run the `course-review` skill's `reference/extract-sources.sh` from the repo root. Done when it exits 0. If a fetch fails, show the message and ask whether to fix the URL or drop the row.
 
 ## Done
 
@@ -77,4 +77,4 @@ python3 scripts/test_rebuild_module.py
 
 Build one sample quiz with the rebuild command `COURSE.md` names (a two-line text2qti file, one multiple-choice question, in the first module's quiz folder), check its `.zip` exists, then delete both files.
 
-Then run the cross-check from `/course-design` Phase 1 ("Load": `COURSE.md` against the repo: folders, labs, adapter skills, lab languages) and report its mismatches, if any. List every `unknown:` left in the syllabus and `COURSE.md`, every pending source, and the next step: open an issue and make the first commit through `contributing-workflow`.
+Then run the cross-check from `/course-design` Phase 1 ("Load": `COURSE.md` against the repo: folders, labs, adapter skills, lab languages) and report its mismatches, if any. List every `unknown:` left in the syllabus and `COURSE.md`, every pending source, and the next step: open an issue and make the first commit through `course-workflow`.

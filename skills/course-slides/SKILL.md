@@ -1,6 +1,6 @@
 ---
-name: slide-prep
-description: Generate a module's SlideKraft slides file (moduleNN_slides.md) from its lecture notes, word for word, with over-budget sections split, figures placed, Demo slides added and Knowledge Check slides carried over from the latest SlideKraft export. Plans first and waits for approval, then checks the file against a measured slide budget and for coverage of the notes. Use after /add-images and before importing into SlideKraft, or when asked to make, rebuild or prepare slides for a module.
+name: course-slides
+description: Generate a module's SlideKraft slides file (moduleNN_slides.md) from its lecture notes, word for word, with over-budget sections split, figures placed, Demo slides added and Knowledge Check slides carried over from the latest SlideKraft export. Plans first and waits for approval, then checks the file against a measured slide budget and for coverage of the notes. Use after /course-images and before importing into SlideKraft, or when asked to make, rebuild or prepare slides for a module.
 ---
 
 # Slide Prep
@@ -13,7 +13,7 @@ Reference files in `reference/` (relative to this skill):
 
 - `format.md`: the slides file syntax, with excerpts from the instructor's SlideKraft export. Follow it exactly.
 - `terms.md`: the vocabulary used below (slides file, slide budget, seam, lead-in, continuation slide, figure group, grid slide, Demo slide, Knowledge Check slide, notes-only section, coverage, flagged block).
-- `check_budget.py`: the checker. It measures; you do not estimate. Run it from the course repo root, by its path in this skill's folder (`<skill>` below: the base directory shown when the skill loads, normally `~/.claude/skills/slide-prep`):
+- `check_budget.py`: the checker. It measures; you do not estimate. Run it from the course repo root, by its path in this skill's folder (`<skill>` below: the base directory shown when the skill loads, normally `~/.claude/skills/course-slides`):
 
 ```bash
 python3 <skill>/reference/check_budget.py <notes>/moduleNN/moduleNN_slides.md
@@ -26,7 +26,7 @@ The budget values and the notes-only list live at the top of `check_budget.py`. 
 ## Rules
 
 - **Never reword.** Every body line of the notes, outside notes-only sections, goes into the slides file word for word and in order. Only figure groups may move. A flagged block is reported to the user, not cut.
-- **Never edit the notes**, a `.slides` file (app-managed JSON) or the instructor's SlideKraft Markdown export. Content fixes go through `/review-module`.
+- **Never edit the notes**, a `.slides` file (app-managed JSON) or the instructor's SlideKraft Markdown export. Content fixes go through `/course-review`.
 - The export is a format and placement reference only. Its wording is stale: take no text from it except the Knowledge Check blocks.
 - Line numbers come from the checker or `cat -n`, never from estimation.
 - Never branch, commit or open PRs. Stop at a clean working tree (see Done).

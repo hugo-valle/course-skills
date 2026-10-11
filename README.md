@@ -20,17 +20,21 @@ git clone https://github.com/hugo-valle/course-skills.git ~/course-skills
 | `course-init` | Sets up a new course repo: copies `template/`, interviews the instructor and drafts the syllabus, drafts `COURSE.md`, creates module folders and writes the sources manifest, confirming each phase before writing |
 | `course-design` | Whole-course evaluation against the syllabus; drafts proposals, publishes approved ones as issues. Drafts `COURSE.md` when a course has none |
 | `course-implement` | Carries out one approved `course-design` proposal through the build skills `COURSE.md` names |
-| `slide-prep` | Generates a module's SlideKraft slides file from its notes, word for word, and checks it against a measured slide budget (`reference/check_budget.py --self-test`) |
-| `review-module` | Reviews one module with three read-only reviewer agents (Accuracy, Style, Alignment); findings cite the course's sources by name and page, or a web source by URL and snapshot date. Builds the source cache (PDF pages, dated web snapshots) from the course's `instructor_material/README.md` (`reference/test_extract_sources.sh` is its self-test) |
-| `add-images` | Plans, draws, builds and embeds TikZ figures for one module. Ships the base style (`reference/base.tex`: palette, title, note, callout, badge, arrows); each course keeps a style layer for its domain shapes and colour meanings, named in `COURSE.md` ("Figures") |
+| `course-slides` | Generates a module's SlideKraft slides file from its notes, word for word, and checks it against a measured slide budget (`reference/check_budget.py --self-test`) |
+| `course-review` | Reviews one module with three read-only reviewer agents (Accuracy, Style, Alignment); findings cite the course's sources by name and page, or a web source by URL and snapshot date. Builds the source cache (PDF pages, dated web snapshots) from the course's `instructor_material/README.md` (`reference/test_extract_sources.sh` is its self-test) |
+| `course-images` | Plans, draws, builds and embeds TikZ figures for one module. Ships the base style (`reference/base.tex`: palette, title, note, callout, badge, arrows); each course keeps a style layer for its domain shapes and colour meanings, named in `COURSE.md` ("Figures") |
 | `course-content` | Which content files are source vs generated and how to rebuild them, from `COURSE.md` ("Module layout") |
-| `quiz-authoring` | text2qti quiz banks; file names, question types and coverage target come from `COURSE.md` ("Quizzes") |
-| `contributing-workflow` | Issue → branch → PR, commit-message lint, hooks and semester prep, using the scripts from `template/` |
+| `course-quizzes` | text2qti quiz banks; file names, question types and coverage target come from `COURSE.md` ("Quizzes") |
+| `course-workflow` | Issue → branch → PR, commit-message lint, hooks and semester prep, using the scripts from `template/` |
 | `course-idea` | `/course-idea <text>`: turns a loose course idea (layout, lab, presentation, technology) into a GitHub issue labelled `idea` and `needs-triage`, after you OK the draft. User-invoked only |
 
 | Agent | Use it for |
 |---|---|
-| `module-accuracy-reviewer`, `module-style-reviewer`, `module-alignment-reviewer` | Dispatched by `review-module` only. Read and search tools only, so a reviewer cannot edit files |
+| `course-module-accuracy-reviewer`, `course-module-style-reviewer`, `course-module-alignment-reviewer` | Dispatched by `course-review` only. Read and search tools only, so a reviewer cannot edit files |
+
+## Naming
+
+Every skill and agent in this repo starts with `course-`, so none of them collides with another plugin's. A course's own adapter skill is named `<course-code>-<what>` (for example `cs2810-exercise-toolkit`), without the `course-` prefix, and lives in that course repo's `.claude/skills/`. Why: [ADR 0002](docs/adr/0002-course-prefix-for-shared-skills.md).
 
 ## Template
 
@@ -47,5 +51,5 @@ git clone https://github.com/hugo-valle/course-skills.git ~/course-skills
 scripts/test_leak_check.sh   # self-test of the leak check
 scripts/leak_check.sh        # skills/, agents/ and template/ (not its docs/agents/ example) are free of course terms
 (cd template && python3 scripts/test_rebuild_module.py)   # rebuild script self-check
-skills/review-module/reference/test_extract_sources.sh   # source extractor self-test
+skills/course-review/reference/test_extract_sources.sh   # source extractor self-test
 ```

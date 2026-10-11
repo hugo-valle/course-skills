@@ -6,7 +6,7 @@ How the engineering skills should consume this repo's domain documentation when 
 
 This repo's glossary is **`GLOSSARY.md`** at the root. It uses the `CONTEXT.md` format (`**Term**:` definition, `_Avoid_:` line). Wherever a skill says `CONTEXT.md`, read and write `GLOSSARY.md` instead, and **do not create a `CONTEXT.md`**. The terms are course vocabulary (pipeline stage, hazard, forwarding, …), and they must stay correct for students.
 
-- `/review-module` gives `GLOSSARY.md` to its Style and Alignment reviewers. In its apply phase it adds or updates an entry whenever a term's usage is settled.
+- `/course-review` gives `GLOSSARY.md` to its Style and Alignment reviewers. In its apply phase it adds or updates an entry whenever a term's usage is settled.
 - `/domain-modeling` (through `/grill-with-docs`, `/triage` and others) writes resolved terms to the same file.
 - ADRs go in `docs/adr/`, created lazily when a decision is first worth recording, such as a course-wide convention like "quizzes state the pipeline-register overhead assumption".
 

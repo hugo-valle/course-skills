@@ -1,5 +1,5 @@
 ---
-name: add-images
+name: course-images
 description: Create clean, publishable TikZ diagrams for a lecture module and embed them in its Markdown notes. Reads the module's notes and required readings, proposes a figure plan for approval, then builds SVG figures. Use when asked to add, create or redo figures/images/diagrams for a module's lecture notes.
 ---
 
@@ -82,4 +82,4 @@ For each figure, insert at the planned position (the caption ends with the capti
 
 ## Done
 
-Ask whether to keep or delete the `.preview/` files (Preview files rule). Report: figures created, notes edited, discrepancies found and how the user resolved them, and "slides not updated." Then point to the next step: "next: `/slide-prep NN` to generate the slides file." Remind the user that the course's git workflow applies (the skill and tracker doc `COURSE.md` names under "Pointers").
+Ask whether to keep or delete the `.preview/` files (Preview files rule). Report: figures created, notes edited, discrepancies found and how the user resolved them, and "slides not updated." Then point to the next step: "next: `/course-slides NN` to generate the slides file." Remind the user that the course's git workflow applies (the skill and tracker doc `COURSE.md` names under "Pointers").

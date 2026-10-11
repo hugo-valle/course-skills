@@ -45,4 +45,4 @@ If no idea was given above, ask for it in one line and stop.
    EOF
    )"
    ```
-6. Reply with the issue URL in one line. No branch, no commit: an idea isn't work yet. When it's promoted, the instructor swaps `idea` for a real label (`course-design`, `enhancement`, `module-readiness`) and follows `contributing-workflow`.
+6. Reply with the issue URL in one line. No branch, no commit: an idea isn't work yet. When it's promoted, the instructor swaps `idea` for a real label (`course-design`, `enhancement`, `module-readiness`) and follows `course-workflow`.

@@ -10,7 +10,7 @@ Issues and specs for this repo live as GitHub issues. Use the `gh` CLI for all o
 - **Comment on an issue**: `gh issue comment <number> --body "..."`
 - **Apply / remove labels**: `gh issue edit <number> --add-label "..."` / `--remove-label "..."`
 - **Close**: `gh issue close <number> --comment "..."`
-- **Doing the work**: follow the `contributing-workflow` skill. Each issue gets a branch named `<issue#>-short-description` and a PR whose body says `Closes #N`, using `.github/pull_request_template.md`. The commit hooks reject commits on `main`.
+- **Doing the work**: follow the `course-workflow` skill. Each issue gets a branch named `<issue#>-short-description` and a PR whose body says `Closes #N`, using `.github/pull_request_template.md`. The commit hooks reject commits on `main`.
 
 Infer the repo from `git remote -v`; `gh` does this automatically when run inside a clone.
 
@@ -37,11 +37,11 @@ Besides the triage labels in `triage-labels.md`:
 
 ## Skills that stop at the working tree
 
-`/review-module`, `/add-images` and `/slide-prep` never branch, commit or open PRs. They stop at the working tree, and the work then goes through the issue → branch → PR flow above.
+`/course-review`, `/course-images` and `/course-slides` never branch, commit or open PRs. They stop at the working tree, and the work then goes through the issue → branch → PR flow above.
 
-- **`/review-module NN` findings not applied in the session**: with the user's OK, publish them as one issue titled `Module N content review findings`. Label it `documentation` and `module-readiness`, and add the triage label that fits (`ready-for-agent` when every fix is fully specified). The body lists the findings in the skill's report shape, one per item: severity, `path:line`, problem and fix.
-- **`/add-images NN`**: open the issue before drawing (for example "Add Module N lecture figures"). Note edits that resolve discrepancies go in the same PR as the figures.
-- **`/slide-prep NN`**: open a `module-readiness` issue before generating (for example "Generate Module N SlideKraft slides file"). The PR commits `moduleNN_slides.md`, not the SlideKraft export or the `.slides` file. Flagged blocks the user does not shorten in the same PR, and Knowledge Checks the skill could not place, are listed in that issue.
+- **`/course-review NN` findings not applied in the session**: with the user's OK, publish them as one issue titled `Module N content review findings`. Label it `documentation` and `module-readiness`, and add the triage label that fits (`ready-for-agent` when every fix is fully specified). The body lists the findings in the skill's report shape, one per item: severity, `path:line`, problem and fix.
+- **`/course-images NN`**: open the issue before drawing (for example "Add Module N lecture figures"). Note edits that resolve discrepancies go in the same PR as the figures.
+- **`/course-slides NN`**: open a `module-readiness` issue before generating (for example "Generate Module N SlideKraft slides file"). The PR commits `moduleNN_slides.md`, not the SlideKraft export or the `.slides` file. Flagged blocks the user does not shorten in the same PR, and Knowledge Checks the skill could not place, are listed in that issue.
 
 ## Design reviews
 

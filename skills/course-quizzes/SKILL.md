@@ -1,5 +1,5 @@
 ---
-name: quiz-authoring
+name: course-quizzes
 description: Rules for writing and editing quiz banks in text2qti format, with the course's file names, question types and coverage target read from COURSE.md. Use when creating or editing quiz .md files under the course's quiz root, adding questions, checking coverage per learning objective, building a QTI .zip, or editing quiz reference sheets.
 ---
 

@@ -1,5 +1,5 @@
 ---
-name: contributing-workflow
+name: course-workflow
 description: A course repo's issue → branch → PR workflow, commit-message lint rules and git hooks (scripts/check-commit-message.sh, .githooks/). Use before creating a branch, committing, pushing or opening a pull request, when a commit is rejected by the commit-msg or pre-push hook or by the Commit Message Lint CI job, or when starting semester prep with new_semester.sh.
 ---
 
@@ -40,4 +40,4 @@ Run `./scripts/install-hooks.sh` once per clone. It sets `core.hooksPath` to `.g
 
 ## Skills that stop at the working tree
 
-`/review-module`, `/add-images` and `/slide-prep` never branch, commit or open PRs. Their work then goes through this flow; the tracker doc says how their output becomes issues.
+`/course-review`, `/course-images` and `/course-slides` never branch, commit or open PRs. Their work then goes through this flow; the tracker doc says how their output becomes issues.

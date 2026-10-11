@@ -1,5 +1,5 @@
 ---
-name: review-module
+name: course-review
 description: Review one module's lecture notes, quizzes, hands-on exercises and discussion with three parallel read-only reviewer agents (Accuracy, Style, Alignment) and report ranked findings that cite the course's sources by name and page (web sources by URL and snapshot date). Use when asked to review, proofread, audit or quality-check a module's course content.
 ---
 
@@ -7,16 +7,16 @@ description: Review one module's lecture notes, quizzes, hands-on exercises and 
 
 Review the content of one module, `moduleNN`, and report findings. The unit of work is one module. Reviewers run as isolated, read-only agents so none is biased by another or by whoever wrote the content.
 
-Invocation: `/review-module NN [--only <artifact type>] [--reviewer accuracy|style|alignment]`
+Invocation: `/course-review NN [--only <artifact type>] [--reviewer accuracy|style|alignment]`
 
 Course details come from `COURSE.md` at the repo root: "Module layout" (artifact table, modules with no content, rebuild command), "Sources" (manifest, course edition, citation form), "Course style rules", "Syllabus" and "Pointers" (glossary, tracker). If `COURSE.md` is missing, stop and suggest `/course-design`, which drafts it.
 
-Reference files in `reference/` (relative to this skill; `<skill>` below is the base directory shown when the skill loads, normally `~/.claude/skills/review-module`):
+Reference files in `reference/` (relative to this skill; `<skill>` below is the base directory shown when the skill loads, normally `~/.claude/skills/course-review`):
 
 - `style-rubric.md`: the generic style rules (N, Q, E, D).
 - `extract-sources.sh`: builds the source cache from the manifest: PDF pages (`kind` `pdf`) and dated text snapshots of web documentation (`kind` `url`). A rerun keeps existing snapshots; `--refresh` fetches them again. `test_extract_sources.sh` is its self-test.
 
-The reviewers are the agents `module-accuracy-reviewer`, `module-style-reviewer` and `module-alignment-reviewer`. They have only read and search tools.
+The reviewers are the agents `course-module-accuracy-reviewer`, `course-module-style-reviewer` and `course-module-alignment-reviewer`. They have only read and search tools.
 
 ## Rules
 
@@ -89,7 +89,7 @@ Severity:
 
 ## Done
 
-Report: findings by severity, what was applied, what was skipped, and which generated files were rebuilt; they belong in their own commit after the source fixes (for example "Rebuild Module NN quiz zips and exercise pages"). End with "next: `/add-images NN`, then `/slide-prep NN`".
+Report: findings by severity, what was applied, what was skipped, and which generated files were rebuilt; they belong in their own commit after the source fixes (for example "Rebuild Module NN quiz zips and exercise pages"). End with "next: `/course-images NN`, then `/course-slides NN`".
 
 If findings were skipped or deferred, ask with `AskUserQuestion` whether to publish them as an issue. Follow the tracker doc named in "Pointers" for the title, labels and body format. Create the issue only on a yes.
 
