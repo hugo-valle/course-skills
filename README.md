@@ -6,14 +6,26 @@ The skills hold no course-specific detail. Each course repo describes itself in 
 
 ## Install
 
+This repo is a Claude Code plugin and its own marketplace. In a course repo, from its root:
+
 ```bash
-git clone https://github.com/hugo-valle/course-skills.git ~/course-skills
-~/course-skills/install.sh ~/cs2810/cs2810-master ~/cs6200/cs6200-master   # one or more course repos
+claude plugin marketplace add hugo-valle/course-skills --scope project
+claude plugin install course-skills@course-skills --scope project
 ```
 
-`install.sh <course-repo>...` symlinks each folder in `skills/` and each file in `agents/` into that repo's `.claude/skills/` and `.claude/agents/`, next to any adapter skill the course keeps there. Nothing is installed globally. Re-run it after adding a skill or agent; edits to an existing one need no re-run. The links are machine-specific, so each course's `.gitignore` carries `.claude/skills/course-*` and `.claude/agents/course-*` (the template has them; the installer warns if they are missing). A fresh clone or CI has no skills until the installer is run there. For a brand-new course, make the repo folder, run the installer on it, then `/course-init`. Why: [ADR 0003](docs/adr/0003-install-skills-per-course-repo.md).
+Commit the `.claude/settings.json` they write. Anyone who opens the course repo and accepts the folder-trust prompt gets the skills and agents, with no script and no symlinks. They are namespaced by the plugin, so you run `/course-skills:course-review`, and the agents appear as `course-skills:course-module-*-reviewer`. The repo is private, so each person needs git read access with stored credentials (`gh auth login`, then `gh auth setup-git`); CI needs `GH_TOKEN` and `gh auth setup-git`. For a brand-new course, make the repo folder, run the two commands, then `/course-skills:course-init`.
+
+Updates: `plugin.json` sets no `version`, so every push to `main` is an update. Auto-update is off by default; turn it on under Marketplaces in `/plugin`, or run `claude plugin marketplace update course-skills`.
+
+To edit the skills and test them live, start Claude Code with `claude --plugin-dir ~/course-skills`; that copy replaces the installed one for the session, and `/reload-plugins` picks up edits.
+
+### Without the plugin
+
+A course repo that cannot use plugins can symlink instead: `git clone https://github.com/hugo-valle/course-skills.git ~/course-skills`, then `~/course-skills/install.sh <course-repo>...`. This links `skills/*` and `agents/*` into the repo's `.claude/`, so the commands are bare (`/course-review`). The links are machine-specific, so add `.claude/skills/course-*` and `.claude/agents/course-*` to that repo's `.gitignore`; a fresh clone has no skills until the installer is run. Why: [ADR 0003](docs/adr/0003-install-skills-per-course-repo.md).
 
 ## Contents
+
+Command names below are bare; installed as a plugin, each takes the `course-skills:` prefix (`/course-skills:course-idea`).
 
 | Skill | Use it for |
 |---|---|
