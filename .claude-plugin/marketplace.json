@@ -1,0 +1,12 @@
+{
+  "name": "course-skills",
+  "description": "Skills and agents for building university courses.",
+  "owner": { "name": "Hugo Valle" },
+  "plugins": [
+    {
+      "name": "course-skills",
+      "source": "./",
+      "description": "Course design, lecture figures, slides, quizzes, lab walkthrough and validation, module review, and course repo workflow."
+    }
+  ]
+}
