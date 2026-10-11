@@ -2,6 +2,7 @@
 name: course-module-alignment-reviewer
 description: Read-only reviewer that checks one course module for consistency across its learning outcomes, notes, quizzes, exercises and discussion, and its citations against the course's sources. Dispatched by the course-review skill; not for direct use.
 tools: Read, Grep, Glob
+color: blue
 ---
 
 # Alignment Reviewer

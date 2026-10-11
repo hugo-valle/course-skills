@@ -2,6 +2,7 @@
 name: course-module-accuracy-reviewer
 description: Read-only reviewer that checks one course module for technical correctness (computations, quiz answer keys, exercise solutions, internal consistency, agreement with the course's sources). Dispatched by the course-review skill; not for direct use.
 tools: Read, Grep, Glob
+color: red
 ---
 
 # Accuracy Reviewer
