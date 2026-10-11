@@ -26,6 +26,7 @@ git clone https://github.com/hugo-valle/course-skills.git ~/course-skills
 | `course-content` | Which content files are source vs generated and how to rebuild them, from `COURSE.md` ("Module layout") |
 | `quiz-authoring` | text2qti quiz banks; file names, question types and coverage target come from `COURSE.md` ("Quizzes") |
 | `contributing-workflow` | Issue → branch → PR, commit-message lint, hooks and semester prep, using the scripts from `template/` |
+| `idea` | `/idea <text>`: turns a loose course idea (layout, lab, presentation, technology) into a GitHub issue labelled `idea` and `needs-triage`, after you OK the draft. User-invoked only |
 
 | Agent | Use it for |
 |---|---|
