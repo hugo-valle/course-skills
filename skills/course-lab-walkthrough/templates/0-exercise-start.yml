@@ -1,0 +1,148 @@
+name: Exercise Start
+
+on:
+  push:
+    branches: [main]
+    paths-ignore:
+      # LAB-SPECIFIC: adjust or remove if this lab has no non-graded practice folder.
+      - 'hands_on_exercises/**'
+
+permissions:
+  contents: write
+  actions: write
+  issues: write
+
+env:
+  # Check `gh api repos/skills/exercise-toolkit/tags --jq '.[].name'` for the
+  # current latest tag before reusing this file for a new lab.
+  EXERCISE_TOOLKIT_REF: v0.9.3
+
+jobs:
+  find_existing:
+    name: Check for an existing exercise issue
+    # GOTCHA: never run the student-onboarding flow on the template repo
+    # itself -- only in repos generated FROM it. `is_template` is a repo-level
+    # GitHub setting (confirm it's actually set: `gh api repos/<org>/<repo>
+    # --jq '.is_template'`), true on every branch of this repo -- which is
+    # exactly why Phase 7's live test (pushing a throwaway branch to THIS SAME
+    # repo) needs to temporarily flip it to false first, or every job here
+    # just silently no-ops. See the skill's Phase 7 section.
+    if: ${{ !github.event.repository.is_template }}
+    runs-on: ubuntu-latest
+    outputs:
+      issue-url: ${{ steps.find.outputs.issue-url }}
+    steps:
+      - name: Find exercise issue
+        id: find
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          result=$(gh issue list --repo "${{ github.repository }}" --state all --search "Exercise in:title" --json number,url --jq '.[0]')
+          if [ -z "$result" ] || [ "$result" = "null" ]; then
+            echo "No exercise issue found yet"
+            exit 0
+          fi
+          echo "issue-url=$(echo "$result" | jq -r '.url')" >> "$GITHUB_OUTPUT"
+
+  start_exercise:
+    name: Create exercise issue
+    needs: [find_existing]
+    # GOTCHA: do NOT add `github.actor != 'github-classroom[bot]'` here. If you
+    # exclude the classroom bot's own repo-provisioning push, the exercise only
+    # starts after the student's own first push -- a chicken-and-egg problem,
+    # since Task 1's instructions live in the issue this creates. Letting the
+    # bot's push start it means the issue is just there when the student opens
+    # the repo, no action required. (Keep the actor exclusion on the ongoing
+    # progress-check workflow below -- that one's just about not wasting CI on
+    # an untouched scaffold, a different concern.)
+    if: ${{ !github.event.repository.is_template && needs.find_existing.outputs.issue-url == '' }}
+    uses: skills/exercise-toolkit/.github/workflows/start-exercise.yml@v0.9.3
+    with:
+      # LAB-SPECIFIC: exercise-title and intro-message.
+      # GOTCHA: exercise-title must NOT contain a colon. The reusable
+      # start-exercise.yml embeds it unquoted into its own `template-vars: |`
+      # block -- a colon there breaks its internal YAML parsing with
+      # "Invalid input: 'template-vars' must be valid JSON or YAML format".
+      # Use an em dash instead: "Lab N — Some Title", never "Lab N: Some Title".
+      exercise-title: "Lab N — Replace With Lab Title"
+      intro-message: "Replace with a 1-2 sentence summary of the lab (points breakdown, task count, working file)."
+
+  post_task_1:
+    name: Personalize README and post Task 1
+    needs: [find_existing, start_exercise]
+    if: ${{ !github.event.repository.is_template && needs.start_exercise.result == 'success' }}
+    runs-on: ubuntu-latest
+    env:
+      ISSUE_URL: ${{ needs.start_exercise.outputs.issue-url }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+        with:
+          # GOTCHA: never hardcode `ref: main`. This must pick up the commit
+          # start-exercise.yml just made (the generic README overwrite) before
+          # this job overwrites it again with the personalized version, and
+          # github.ref_name is what actually triggered this run (main in
+          # production, but also whatever branch you're using for live testing
+          # -- see the skill's test-branch phase).
+          ref: ${{ github.ref_name }}
+
+      - name: Get exercise-toolkit templates
+        uses: actions/checkout@v6
+        with:
+          repository: skills/exercise-toolkit
+          path: exercise-toolkit
+          ref: ${{ env.EXERCISE_TOOLKIT_REF }}
+
+      - name: Build README from template
+        id: build-readme
+        uses: skills/action-text-variables@v4
+        with:
+          template-file: .github/steps/readme-in-progress.md
+          template-vars: |
+            title: "Lab N — Replace With Lab Title"
+            login: ${{ github.actor }}
+            issue_url: ${{ env.ISSUE_URL }}
+
+      - name: Overwrite README
+        env:
+          README_TEXT: ${{ steps.build-readme.outputs.updated-text }}
+        run: echo "$README_TEXT" > README.md
+
+      - name: Commit README
+        uses: EndBug/add-and-commit@v10
+        with:
+          add: "README.md"
+          message: "Personalize README for exercise start"
+          default_author: github_actions
+
+      - name: Create comment - Task 1 instructions
+        run: |
+          gh issue comment "$ISSUE_URL" \
+            --body-file .github/steps/task-1.md
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Create comment - watching for progress
+        run: |
+          gh issue comment "$ISSUE_URL" \
+            --body-file exercise-toolkit/markdown-templates/step-feedback/watching-for-progress.md
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Disable this workflow
+        # GOTCHA: disable by FILENAME, never "${{ github.workflow }}" (the
+        # display name). If a workflow file is ever renamed during iteration
+        # (e.g. while testing this very setup), GitHub keeps the old name
+        # registered as an orphaned duplicate -- and `gh workflow disable` by
+        # NAME then fails with "could not find any workflows named X" because
+        # it's ambiguous. Filenames are always unique. Also note this file
+        # MUST be named with a numeric prefix (0-exercise-start.yml, not
+        # exercise-start.yml) -- the reusable start-exercise.yml's own
+        # disable_workflows job does `git ls-files | grep -E
+        # '^\.github/workflows/[0-9].*\.(yml|yaml)$'` with no `|| true` on
+        # that pipeline itself, so with zero numbered workflow files it exits
+        # 1 and crashes the whole job under `bash -e`.
+        run: gh workflow disable "0-exercise-start.yml"
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}

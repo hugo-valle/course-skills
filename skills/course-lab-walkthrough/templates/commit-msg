@@ -1,0 +1,53 @@
+#!/bin/sh
+# commit-msg hook: reject the vague commit messages docs/GIT_BEST_PRACTICES.md
+# already tells students to avoid, before the commit is even created.
+#
+# This is a real-time, client-side safety net -- it can always be bypassed
+# with `git commit --no-verify`, and git workflow quality is still graded
+# manually (see docs/GRADING_RUBRIC.md). It's meant to build the habit, not
+# replace that review.
+#
+# KEEP IN SYNC: this pattern must match BAD_MESSAGE_PATTERN in
+# .github/scripts/check_git_workflow.sh -- if you change one, change both.
+BAD_MESSAGE_PATTERN='^(wip|update|stuff|temp|asdf|final|final final|fix)$'
+
+commit_msg_file="$1"
+commit_source="$2"
+
+# Merge/squash commits get git-generated messages (e.g. "Merge branch 'x'")
+# -- not something a student wrote, so nothing to validate here. An EXPLICIT
+# vague message given via `-m` during a merge is still caught below, since
+# git only reports commit_source as "merge" for the auto-generated message
+# case -- verify this distinction live, don't just trust it (see the skill's
+# Phase 8 verification list).
+case "$commit_source" in
+    merge|squash)
+        exit 0
+        ;;
+esac
+
+# Subject line: first non-empty, non-comment line in the message file.
+subject=$(grep -v '^#' "$commit_msg_file" | grep -m1 '[^[:space:]]')
+subject_trimmed=$(printf '%s' "$subject" | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//')
+subject_lower=$(printf '%s' "$subject_trimmed" | tr '[:upper:]' '[:lower:]')
+
+if printf '%s' "$subject_lower" | grep -Eq "$BAD_MESSAGE_PATTERN"; then
+    echo "" >&2
+    echo "❌ Commit rejected: \"$subject_trimmed\" is too vague." >&2
+    echo "" >&2
+    echo "   See docs/GIT_BEST_PRACTICES.md for the full guide. Examples:" >&2
+    echo "" >&2
+    # LAB-SPECIFIC: pull these three examples straight from this lab's own
+    # docs/GIT_BEST_PRACTICES.md "Examples You Can Copy" section, don't
+    # invent generic ones -- they should describe THIS lab's actual tasks.
+    echo "     task1: add program banner strings" >&2
+    echo "     feat: <replace with a real Task N summary from this lab>" >&2
+    echo "     fix: <replace with a real follow-up-fix example from this lab>" >&2
+    echo "" >&2
+    echo "   Bypass (not recommended -- git workflow is graded manually):" >&2
+    echo "     git commit --no-verify" >&2
+    echo "" >&2
+    exit 1
+fi
+
+exit 0

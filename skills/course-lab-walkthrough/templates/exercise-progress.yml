@@ -1,0 +1,326 @@
+name: Exercise Progress
+
+on:
+  push:
+    branches: [main]
+    paths-ignore:
+      # LAB-SPECIFIC: adjust or remove.
+      - 'hands_on_exercises/**'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  issues: write
+
+env:
+  EXERCISE_TOOLKIT_REF: v0.9.3
+
+jobs:
+  find_exercise:
+    name: Find exercise issue
+    # GOTCHA: same template-repo guard as 0-exercise-start.yml -- see that
+    # file's comment for why, and the skill's Phase 7 section for how to test
+    # it live without permanently disabling the guard.
+    if: ${{ !github.event.repository.is_template }}
+    runs-on: ubuntu-latest
+    outputs:
+      issue-url: ${{ steps.find.outputs.issue-url }}
+      issue-number: ${{ steps.find.outputs.issue-number }}
+    steps:
+      - name: Find exercise issue
+        id: find
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          result=$(gh issue list --repo "${{ github.repository }}" --state all --search "Exercise in:title" --json number,url --jq '.[0]')
+          if [ -z "$result" ] || [ "$result" = "null" ]; then
+            echo "No exercise issue found yet"
+            exit 0
+          fi
+          echo "issue-url=$(echo "$result" | jq -r '.url')" >> "$GITHUB_OUTPUT"
+          echo "issue-number=$(echo "$result" | jq -r '.number')" >> "$GITHUB_OUTPUT"
+
+  check_progress:
+    name: Check progress and post next step
+    needs: [find_exercise]
+    # This exclusion IS correct here (unlike 0-exercise-start.yml) -- it's
+    # just about not wasting CI re-running tests against an untouched scaffold
+    # the instant Classroom provisions the repo.
+    if: ${{ !github.event.repository.is_template && github.actor != 'github-classroom[bot]' && needs.find_exercise.outputs.issue-url != '' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      ISSUE_URL: ${{ needs.find_exercise.outputs.issue-url }}
+      ISSUE_NUMBER: ${{ needs.find_exercise.outputs.issue-number }}
+      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+        with:
+          ref: ${{ github.ref_name }} # GOTCHA: never hardcode `main`, see 0-exercise-start.yml
+          fetch-depth: 0 # only needed if you keep the git workflow check step below
+
+      - name: Get exercise-toolkit templates
+        uses: actions/checkout@v6
+        with:
+          repository: skills/exercise-toolkit
+          path: exercise-toolkit
+          ref: ${{ env.EXERCISE_TOOLKIT_REF }}
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: '3.x'
+          # LAB-SPECIFIC: swap for whatever the test harness actually needs
+          # (a different interpreter/toolchain setup step), or drop entirely.
+
+      # GOTCHA (the most important one): once the done-marker has been
+      # posted, NOTHING below this point may ever touch the issue again.
+      # There is no trailing placeholder comment left after completion (see
+      # "Post next task content" below), so the finished/congrats comment
+      # itself becomes "the last bot comment" on the thread -- and the
+      # `--edit-last` calls in "Update comment - checking work" and "Update
+      # comment - step results" would silently overwrite it on the very next
+      # push, destroying its done-marker. That makes the workflow think it's
+      # NOT done yet and post a SECOND congrats comment + a second README
+      # commit -- and this repeats on every push thereafter. Caught live
+      # during testing; short-circuiting everything up front is the fix.
+      - name: Check if already complete
+        run: |
+          already_done=$(gh api "repos/${{ github.repository }}/issues/${ISSUE_NUMBER}/comments" --paginate -q '.[].body' | grep -F "<!-- LABID-step:done -->" || true)
+          if [ -n "$already_done" ]; then
+            echo "Exercise already complete, nothing to check."
+            echo "ALREADY_DONE=true" >> "$GITHUB_ENV"
+          fi
+
+      - name: Update comment - checking work
+        if: env.ALREADY_DONE != 'true'
+        run: |
+          gh issue comment "$ISSUE_URL" \
+            --body-file exercise-toolkit/markdown-templates/step-feedback/checking-work.md \
+            --edit-last
+
+      # LAB-SPECIFIC: replace with however this lab's test harness reports
+      # per-task pass/fail. Whatever text markers you grep for here must be
+      # EXACT SUBSTRINGS of the harness's own printed summary -- if there's
+      # an older CI workflow that already greps the harness's output for pass/
+      # fail (read it first!), copy its exact patterns so both stay in sync,
+      # or better, retire that old workflow and consolidate (see the skill's
+      # "consolidate CI" phase). The two-task example below is illustrative
+      # only -- it's the literal wording from one specific prior lab, not a
+      # format most harnesses will actually match. Expect to replace it
+      # entirely rather than adapt it.
+      - name: Run project tests
+        id: tests
+        if: env.ALREADY_DONE != 'true'
+        run: |
+          set +e
+          python3 TEST_SCRIPT.py -t all > test-results.txt 2>&1
+          set -e
+
+          task1_status=$(grep -q 'Task 1: PASSED' test-results.txt && echo PASS || echo FAIL)
+          task2_status=$(grep -Eq 'Task 2 — .*: PASSED|Task 2: ALL TESTS PASSED' test-results.txt && echo PASS || echo FAIL)
+          # ... one line per task ...
+
+          next_task="complete"
+          for n in 1 2 3 4; do # LAB-SPECIFIC: adjust the task count/range
+            eval "status=\$task${n}_status"
+            if [ "$status" != "PASS" ]; then
+              next_task="$n"
+              break
+            fi
+          done
+
+          {
+            echo "task1_status=$task1_status"
+            echo "task2_status=$task2_status"
+            echo "next_task=$next_task"
+          } >> "$GITHUB_OUTPUT"
+
+      # OPTIONAL block -- only include if you're retiring an older validation
+      # workflow that ran a git-workflow/commit-hygiene script
+      # (.github/scripts/check_git_workflow.sh or equivalent) and want to
+      # preserve that check instead of silently dropping it. It now runs on
+      # EVERY push instead of once, so students get continuous feedback on
+      # their commit habits alongside their task results, not just a one-time
+      # Actions-tab summary they might never open.
+      - name: Make git workflow script executable
+        if: env.ALREADY_DONE != 'true'
+        run: chmod +x .github/scripts/check_git_workflow.sh
+
+      - name: Check git workflow
+        if: env.ALREADY_DONE != 'true'
+        id: git_workflow
+        run: bash .github/scripts/check_git_workflow.sh
+
+      - name: Build git workflow summary
+        if: env.ALREADY_DONE != 'true'
+        id: git-workflow-summary
+        env:
+          COMMIT_COUNT: ${{ steps.git_workflow.outputs.commit_count }}
+          COMMIT_COUNT_TARGET: ${{ steps.git_workflow.outputs.commit_count_target }}
+          COMMIT_COUNT_MET: ${{ steps.git_workflow.outputs.commit_count_met }}
+          TASK_RELATED_COUNT: ${{ steps.git_workflow.outputs.task_related_count }}
+          TASK_RELATED_MET: ${{ steps.git_workflow.outputs.task_related_met }}
+          BAD_MESSAGE_COUNT: ${{ steps.git_workflow.outputs.bad_message_count }}
+          COMMIT_QUALITY_MET: ${{ steps.git_workflow.outputs.commit_quality_met }}
+          VAGUE_MESSAGES: ${{ steps.git_workflow.outputs.vague_messages }}
+        run: |
+          mark() {
+            if [ "$1" = "yes" ]; then echo "✅"; else echo "❌"; fi
+          }
+
+          {
+            echo "markdown<<GITWORKFLOWEOF"
+            echo "### 📝 Git Workflow Check"
+            echo
+            echo "| Requirement | Status | Details |"
+            echo "|-------------|--------|---------|"
+            echo "| At least 3 commits | $(mark "$COMMIT_COUNT_MET") | ${COMMIT_COUNT:-0} / ${COMMIT_COUNT_TARGET:-3} |"
+            echo "| 3+ commits referencing a task | $(mark "$TASK_RELATED_MET") | ${TASK_RELATED_COUNT:-0} / 3 |"
+            echo "| No vague commit messages (e.g. \"wip\", \"fix\") | $(mark "$COMMIT_QUALITY_MET") | ${BAD_MESSAGE_COUNT:-0} found |"
+            if [ -n "${VAGUE_MESSAGES:-}" ]; then
+              echo
+              echo "Vague messages: ${VAGUE_MESSAGES}"
+            fi
+            echo
+            echo "_Git workflow is graded manually — see \`docs/GIT_BEST_PRACTICES.md\`. This table just helps you track it as you go._"
+            echo "GITWORKFLOWEOF"
+          } >> "$GITHUB_OUTPUT"
+      # end optional block
+
+      # LAB-SPECIFIC: results_table entries (one per task, with point values).
+      - name: Build message - step results
+        if: env.ALREADY_DONE != 'true'
+        id: build-results
+        uses: skills/action-text-variables@v4
+        with:
+          template-file: exercise-toolkit/markdown-templates/step-feedback/step-results-table.md
+          template-vars: |
+            step_number: "1-N"
+            results_table:
+              - description: "Task 1: ... (N pts)"
+                passed: ${{ steps.tests.outputs.task1_status == 'PASS' }}
+              - description: "Task 2: ... (N pts)"
+                passed: ${{ steps.tests.outputs.task2_status == 'PASS' }}
+
+      - name: Update comment - step results
+        if: env.ALREADY_DONE != 'true'
+        env:
+          RESULTS_BODY: ${{ steps.build-results.outputs.updated-text }}
+          # GOTCHA: if you skip the optional git-workflow block above, drop
+          # this env var and just post $RESULTS_BODY directly.
+          GIT_WORKFLOW_BODY: ${{ steps.git-workflow-summary.outputs.markdown }}
+        run: |
+          # GOTCHA: build the combined body with printf, not a literal blank
+          # line inside the `run: |` block scalar -- a bare blank line there
+          # confuses the YAML parser ("could not find expected ':'"), caught
+          # by actionlint. Always run actionlint on these workflow files.
+          COMMENT_BODY="$(printf '%s\n\n%s' "$RESULTS_BODY" "$GIT_WORKFLOW_BODY")"
+          gh issue comment "$ISSUE_URL" \
+            --body "$COMMENT_BODY" \
+            --edit-last
+
+      # Instructor/TA-facing summary, independent of the student-facing issue
+      # comment above. Preserve this (and the artifact upload below) if
+      # you're retiring an older CI workflow that gave instructors this kind
+      # of visibility in the Actions tab.
+      - name: Write step summary
+        if: env.ALREADY_DONE != 'true'
+        env:
+          TASK1: ${{ steps.tests.outputs.task1_status }}
+          TASK2: ${{ steps.tests.outputs.task2_status }}
+          GIT_WORKFLOW_BODY: ${{ steps.git-workflow-summary.outputs.markdown }}
+        run: |
+          {
+            echo "## Lab N Progress Check"
+            echo
+            echo "| Task | Status |"
+            echo "|------|--------|"
+            echo "| Task 1: ... | ${TASK1:-FAIL} |"
+            echo "| Task 2: ... | ${TASK2:-FAIL} |"
+            echo
+            echo "$GIT_WORKFLOW_BODY"
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Upload test results artifact
+        if: env.ALREADY_DONE != 'true'
+        uses: actions/upload-artifact@v7
+        with:
+          name: test-results
+          path: test-results.txt
+          retention-days: 30
+
+      # GOTCHA: this is the idempotency mechanism for revealing task N+1 --
+      # it only fires once per marker, checked via a hidden HTML comment at
+      # the bottom of each task-N.md / the finished-comment template. On the
+      # "complete" branch it deliberately does NOT post a trailing
+      # watching-for-progress.md placeholder (unlike the per-task branch) --
+      # see the big comment on "Check if already complete" above for why that
+      # matters.
+      - name: Post next task content if not already posted
+        if: env.ALREADY_DONE != 'true'
+        env:
+          NEXT_TASK: ${{ steps.tests.outputs.next_task }}
+        run: |
+          if [ "$NEXT_TASK" = "complete" ]; then
+            MARKER="<!-- LABID-step:done -->"
+          else
+            MARKER="<!-- LABID-step:${NEXT_TASK} -->"
+          fi
+
+          already_posted=$(gh api "repos/${{ github.repository }}/issues/${ISSUE_NUMBER}/comments" --paginate -q '.[].body' | grep -F "$MARKER" || true)
+          if [ -n "$already_posted" ]; then
+            echo "Marker $MARKER already posted, nothing to do."
+            exit 0
+          fi
+
+          if [ "$NEXT_TASK" = "complete" ]; then
+            echo "POST_FINISH=true" >> "$GITHUB_ENV"
+          else
+            gh issue comment "$ISSUE_URL" --body-file ".github/steps/task-${NEXT_TASK}.md"
+            gh issue comment "$ISSUE_URL" \
+              --body-file exercise-toolkit/markdown-templates/step-feedback/watching-for-progress.md
+          fi
+
+      - name: Build finished comment
+        if: env.POST_FINISH == 'true'
+        id: build-finished-comment
+        uses: skills/action-text-variables@v4
+        with:
+          template-file: .github/steps/exercise-finished-comment.md
+          template-vars: |
+            login: ${{ github.actor }}
+
+      - name: Create comment - exercise finished
+        if: env.POST_FINISH == 'true'
+        env:
+          COMMENT_BODY: ${{ steps.build-finished-comment.outputs.updated-text }}
+        run: |
+          gh issue comment "$ISSUE_URL" --body "$COMMENT_BODY"
+
+      - name: Build README from template
+        if: env.POST_FINISH == 'true'
+        id: build-readme
+        uses: skills/action-text-variables@v4
+        with:
+          template-file: .github/steps/readme-finished.md
+          template-vars: |
+            title: "Lab N — Replace With Lab Title"
+            login: ${{ github.actor }}
+            issue_url: ${{ env.ISSUE_URL }}
+
+      - name: Overwrite README
+        if: env.POST_FINISH == 'true'
+        env:
+          README_TEXT: ${{ steps.build-readme.outputs.updated-text }}
+        run: echo "$README_TEXT" > README.md
+
+      - name: Commit README
+        if: env.POST_FINISH == 'true'
+        uses: EndBug/add-and-commit@v10
+        with:
+          add: "README.md"
+          message: "Automated checks complete"
+          default_author: github_actions
