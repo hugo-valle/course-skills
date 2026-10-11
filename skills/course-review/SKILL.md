@@ -16,7 +16,7 @@ Reference files in `reference/` (relative to this skill; `<skill>` below is the 
 - `style-rubric.md`: the generic style rules (N, Q, E, D).
 - `extract-sources.sh`: builds the source cache from the manifest: PDF pages (`kind` `pdf`) and dated text snapshots of web documentation (`kind` `url`). A rerun keeps existing snapshots; `--refresh` fetches them again. `test_extract_sources.sh` is its self-test.
 
-The reviewers are the agents `course-module-accuracy-reviewer`, `course-module-style-reviewer` and `course-module-alignment-reviewer`. They have only read and search tools.
+The reviewers are the agents `course-module-accuracy-reviewer`, `course-module-style-reviewer` and `course-module-alignment-reviewer`. When this repo is installed as a plugin, the agent types carry the plugin prefix (`course-skills:course-module-accuracy-reviewer`); use the name the agent list shows. They have only read and search tools.
 
 ## Rules
 
