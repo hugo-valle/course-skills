@@ -13,7 +13,7 @@ claude plugin marketplace add hugo-valle/course-skills --scope project
 claude plugin install course-skills@course-skills --scope project
 ```
 
-Commit the `.claude/settings.json` they write. Anyone who opens the course repo and accepts the folder-trust prompt gets the skills and agents, with no script and no symlinks. They are namespaced by the plugin, so you run `/course-skills:course-review`, and the agents appear as `course-skills:course-module-*-reviewer`. The repo is private, so each person needs git read access with stored credentials (`gh auth login`, then `gh auth setup-git`); CI needs `GH_TOKEN` and `gh auth setup-git`. For a brand-new course, make the repo folder, run the two commands, then `/course-skills:course-init`.
+Commit the `.claude/settings.json` they write. Anyone who opens the course repo and accepts the folder-trust prompt gets the skills and agents, with no script and no symlinks. They are namespaced by the plugin, so you run `/course-skills:course-review`, and the agents appear as `course-skills:course-module-*-reviewer`. The repo is public, so no git credentials are needed to fetch the skills. For a brand-new course, make the repo folder, run the two commands, then `/course-skills:course-init`.
 
 Updates: `plugin.json` sets no `version`, so every push to `main` is an update. Auto-update is off by default; turn it on under Marketplaces in `/plugin`, or run `claude plugin marketplace update course-skills`.
 

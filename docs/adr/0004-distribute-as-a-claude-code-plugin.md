@@ -19,7 +19,7 @@ ADR 0003 linked the skills into each course repo with `install.sh`. The links ho
 
 ## Consequences
 
-- Each person needs git read access to this repo (it is private) with stored credentials; CI needs `GH_TOKEN` and `gh auth setup-git`. Making the repo public would remove this; it waits on the history and author-email decision in course-skills#1.
+- The repo is public (made public 2026-10-11 after rewriting the commit author and committer email to the GitHub noreply address), so collaborators and CI need no git credentials to fetch the skills.
 - A non-interactive `-p` run applies the project marketplace only in a folder whose trust was already accepted interactively.
 - Auto-update is off by default; users enable it in `/plugin` or run `claude plugin marketplace update course-skills`.
 - To edit the skills live, run `claude --plugin-dir ~/course-skills`; that copy replaces the installed one for the session.
