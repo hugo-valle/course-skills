@@ -47,6 +47,7 @@ Command names below are bare; installed as a plugin, each takes the `course-skil
 | Agent | Use it for |
 |---|---|
 | `course-module-accuracy-reviewer`, `course-module-style-reviewer`, `course-module-alignment-reviewer` | Dispatched by `course-review` only. Read and search tools only, so a reviewer cannot edit files |
+| `course-lab-student` | Plays a student doing one lab (profiles `competent` and `mistakes`) in a temporary copy of the student folder, with no access to the solution, and reports every point of friction. Dispatch it yourself with the student folder path, the profile, the harness and build commands from `COURSE.md` ("Lab stacks", "Lab delivery"), the paths it must not read, and optionally a scratch repository. Unlike the reviewers it runs commands and writes files, in its own copy only |
 
 ## Naming
 
