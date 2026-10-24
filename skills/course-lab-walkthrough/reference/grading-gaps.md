@@ -9,6 +9,8 @@ Whatever specific, checkable requirement the README states that the harness does
 - **Final state of a variable or register.** The README names where a result must live; the harness only checks printed text, so a wrong location passes. Check state through the tool's own CLI.
 - **Instruction or construct restriction.** The README forbids one; the harness checks only the result. Check by static source inspection.
 - **Calling convention.** Specific registers saved and restored, not an end value, when the call chain creates no observable difference between following it and skipping it (every callee is a leaf). **This recurs**; it showed up in two labs before being caught, so audit it on every new lab in Phase 1.
+- **A failure case checked only by exit status.** The README says an error message must name the offending token or line, and the harness checks only that the run exited non-zero, so any error passes (a lab whose parser rejects everything scores the error row at once). Give each failure case a line naming its expected token and require it in the output.
+- **A stated bound or range with no case.** The task text says a value is limited (a shift amount, an immediate width) and no visible case crosses it. Add one failure case per stated bound.
 - **Required implementation strategy** (for example mandatory recursion) when the harness checks only the return value, so an iterative shortcut passes. Count self-calls inside the procedure's own body.
 
 The stack's recipes (how to read the state, extract a procedure body, match a mnemonic) live in the stack's adapter skill; `COURSE.md` "Lab stacks" names it. Common rules for every recipe:
@@ -29,6 +31,10 @@ Fix pattern:
 - Wire the check into both runner paths.
 - Verify: the pristine scaffold now fails (it always passed), a correct implementation still passes, and a full run is otherwise unaffected.
 - Update every doc that called the task guidance-only or manually reviewed (README, the task's `.github/steps/task-N.md`, the rubric, any HOWTO, the test README) to describe it as automated, and move its points into the automated bucket.
+
+## C. A row that passes before its task is revealed
+
+When several tasks share inputs, a task's grading row can pass after an earlier task (a checkpoint task that needs no new code). A reveal rule of "post the next task after the first failing one" then never posts it. Post every unposted task in order and stop after the first task that fails (`templates/exercise-progress.yml`), and say in the task text when nothing needs writing and what to commit instead. A task with no row of its own needs a single-case check in the progress workflow.
 
 ## Scaffold audit (Phase 5)
 

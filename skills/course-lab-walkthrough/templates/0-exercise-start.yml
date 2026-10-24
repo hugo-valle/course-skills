@@ -65,6 +65,7 @@ jobs:
       # "Invalid input: 'template-vars' must be valid JSON or YAML format".
       # Use an em dash instead: "Lab N — Some Title", never "Lab N: Some Title".
       exercise-title: "Lab N — Replace With Lab Title"
+      # GOTCHA: no colon here either (see the note above): the message is embedded unquoted too.
       intro-message: "Replace with a 1-2 sentence summary of the lab (points breakdown, task count, working file)."
 
   post_task_1:
@@ -143,6 +144,6 @@ jobs:
         # '^\.github/workflows/[0-9].*\.(yml|yaml)$'` with no `|| true` on
         # that pipeline itself, so with zero numbered workflow files it exits
         # 1 and crashes the whole job under `bash -e`.
-        run: gh workflow disable "0-exercise-start.yml"
+        run: gh workflow disable "0-exercise-start.yml" || echo "already disabled" # the toolkit usually disables it first; a second disable is a 403
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
