@@ -74,6 +74,8 @@ jobs:
           python-version: '3.x'
           # LAB-SPECIFIC: swap for whatever the test harness actually needs
           # (a different interpreter/toolchain setup step), or drop entirely.
+          # GOTCHA: some setup actions export warnings-as-errors flags that fail the
+          # starter's build in CI; turn them off in the action's inputs (gotcha 10).
 
       # GOTCHA (the most important one): once the done-marker has been
       # posted, NOTHING below this point may ever touch the issue again.
@@ -262,24 +264,32 @@ jobs:
       - name: Post next task content if not already posted
         if: env.ALREADY_DONE != 'true'
         env:
-          NEXT_TASK: ${{ steps.tests.outputs.next_task }}
+          # LAB-SPECIFIC: one variable per task, in task order.
+          TASK1: ${{ steps.tests.outputs.task1_status }}
+          TASK2: ${{ steps.tests.outputs.task2_status }}
         run: |
-          if [ "$NEXT_TASK" = "complete" ]; then
-            MARKER="<!-- LABID-step:done -->"
-          else
-            MARKER="<!-- LABID-step:${NEXT_TASK} -->"
-          fi
+          # Post every unposted task in order and stop after the first one that does not pass,
+          # so a task whose row already passes (a checkpoint task) is still posted.
+          posted=$(gh api "repos/${{ github.repository }}/issues/${ISSUE_NUMBER}/comments" --paginate -q '.[].body')
+          statuses=("$TASK1" "$TASK2") # LAB-SPECIFIC: all tasks, in order
+          revealed=false
+          next=complete
+          for n in $(seq 1 ${#statuses[@]}); do
+            if ! grep -qF "<!-- LABID-step:${n} -->" <<<"$posted"; then
+              gh issue comment "$ISSUE_URL" --body-file ".github/steps/task-${n}.md"
+              revealed=true
+            fi
+            if [ "${statuses[$((n - 1))]}" != "PASS" ]; then
+              next=$n
+              break
+            fi
+          done
 
-          already_posted=$(gh api "repos/${{ github.repository }}/issues/${ISSUE_NUMBER}/comments" --paginate -q '.[].body' | grep -F "$MARKER" || true)
-          if [ -n "$already_posted" ]; then
-            echo "Marker $MARKER already posted, nothing to do."
-            exit 0
-          fi
-
-          if [ "$NEXT_TASK" = "complete" ]; then
+          if [ "$next" = "complete" ]; then
+            if grep -qF "<!-- LABID-step:done -->" <<<"$posted"; then exit 0; fi
             echo "POST_FINISH=true" >> "$GITHUB_ENV"
-          else
-            gh issue comment "$ISSUE_URL" --body-file ".github/steps/task-${NEXT_TASK}.md"
+          elif [ "$revealed" = true ]; then
+            # The watching placeholder is the comment the next push edits; none after completion.
             gh issue comment "$ISSUE_URL" \
               --body-file exercise-toolkit/markdown-templates/step-feedback/watching-for-progress.md
           fi
@@ -300,22 +310,25 @@ jobs:
         run: |
           gh issue comment "$ISSUE_URL" --body "$COMMENT_BODY"
 
-      - name: Build README from template
+      # GOTCHA: swap only the banner, never rewrite the whole README (gotcha 11), so anything
+      # the student added or ticked there survives the finish.
+      - name: Build finished banner
         if: env.POST_FINISH == 'true'
-        id: build-readme
+        id: build-banner
         uses: skills/action-text-variables@v4
         with:
-          template-file: .github/steps/readme-finished.md
+          template-file: .github/steps/finished-banner.md
           template-vars: |
-            title: "Lab N — Replace With Lab Title"
             login: ${{ github.actor }}
             issue_url: ${{ env.ISSUE_URL }}
 
-      - name: Overwrite README
+      - name: Replace README banner
         if: env.POST_FINISH == 'true'
         env:
-          README_TEXT: ${{ steps.build-readme.outputs.updated-text }}
-        run: echo "$README_TEXT" > README.md
+          BANNER: ${{ steps.build-banner.outputs.updated-text }}
+        run: |
+          awk '/<!-- banner:start -->/{print; print ENVIRON["BANNER"]; skip=1; next} /<!-- banner:end -->/{skip=0} !skip{print}' README.md > README.new
+          mv README.new README.md
 
       - name: Commit README
         if: env.POST_FINISH == 'true'

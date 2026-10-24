@@ -60,3 +60,12 @@ Inspect comment bodies and timestamps with `gh api repos/<org>/<repo>/issues/<N>
 ## Finish
 
 Ask whether to clean up the test branch and issue or leave them for review; delete nothing unasked. Either way restore `is_template` to `true` and check it with `gh api repos/<org>/<repo> --jq '.is_template'`; left `false`, the template repo personalizes its own README on the next push.
+
+## Scratch repo variant (student-folder deliveries)
+
+When the walkthrough lives in a student folder inside the course repo, there is no template repo to branch. Test on a private scratch repo instead; its `is_template` is `false`, so the guard is not needed.
+
+1. Create the scratch repo (ask first). Copy the tracked files of the student folder into a temporary directory, `git init -b main`, commit and push. The first push starts the walkthrough.
+2. Walk through it as in "Walk through it as a student", pushing a staged solution for each task. Build the stages from the instructor copy by replacing unfinished functions with their stubs; check locally which rows pass at each stage, because rows that pass early change what the bot posts.
+3. To reset between runs (ask first): delete the tracking issue, `gh workflow enable 0-exercise-start.yml`, and force-push a fresh copy of the student folder. The start workflow runs again.
+4. After the walkthrough works, run a student agent on it (the `course-lab-student` agent) and fix its findings.
